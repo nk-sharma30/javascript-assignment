@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Extensibility & Sealing | JavaScript Pro</title>
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --secondary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-300: #cbd5e1;
+            --neutral-400: #94a3b8;
+            --neutral-500: #64748b;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1e293b;
+            --neutral-900: #0f172a;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+            min-height: 100vh;
+            color: var(--neutral-800);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 0;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.4;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: -2rem auto 0;
+            padding: 0 2rem 4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--neutral-200);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl), 0 0 0 1px var(--accent-color);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+            padding: 2rem;
+            border-bottom: 1px solid var(--neutral-200);
+            position: relative;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 2rem;
+            right: 2rem;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+            border-radius: 2px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--neutral-800);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-subtitle {
+            color: var(--neutral-600);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .object-info {
+            background: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+
+        .object-title {
+            font-weight: 600;
+            color: var(--neutral-700);
+            margin-bottom: 0.75rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .object-content {
+            color: var(--neutral-600);
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .status-extensible {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-not-extensible {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .status-sealed {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .status-not-sealed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+        }
+
+        .console-output {
+            background: var(--neutral-900);
+            color: var(--neutral-100);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--neutral-700);
+        }
+
+        .console-header {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .console-line {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .console-command {
+            color: var(--success-color);
+        }
+
+        .console-output-text {
+            color: var(--neutral-300);
+        }
+
+        .console-result {
+            color: var(--warning-color);
+            font-weight: 600;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--neutral-200);
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--neutral-700);
+            margin-bottom: 1rem;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-description {
+            color: var(--neutral-600);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .main-container {
+                padding: 0 1rem 2rem;
+            }
+            
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-header,
+            .card-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>JavaScript Pro</h1>
+            <p>Advanced Object Extensibility & Sealing Demonstration</p>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="demo-grid">
+            <!-- Student Object Demo -->
+            <div class="demo-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        🎓 Student Object
+                    </h2>
+                    <p class="card-subtitle">Object.preventExtensions() Demo</p>
+                </div>
+                <div class="card-body">
+                    <div class="object-info">
+                        <div class="object-title">Initial Student Object:</div>
+                        <div class="object-content" id="student-object-display">
+                            {<br>
+                            &nbsp;&nbsp;name: "John Doe",<br>
+                            &nbsp;&nbsp;age: 20,<br>
+                            &nbsp;&nbsp;grade: "A"<br>
+                            }
+                        </div>
+                    </div>
+                    
+                    <button class="action-button" onclick="preventStudentExtensions()">
+                        Prevent Extensions
+                    </button>
+                    
+                    <div id="student-status">
+                        <div class="status-badge status-extensible">
+                            ✓ Extensible
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher Object Demo -->
+            <div class="demo-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        👩‍🏫 Teacher Object
+                    </h2>
+                    <p class="card-subtitle">Object.seal() Demo</p>
+                </div>
+                <div class="card-body">
+                    <div class="object-info">
+                        <div class="object-title">Initial Teacher Object:</div>
+                        <div class="object-content" id="teacher-object-display">
+                            {<br>
+                            &nbsp;&nbsp;subject: "Math"<br>
+                            }
+                        </div>
+                    </div>
+                    
+                    <button class="action-button" onclick="sealTeacherObject()">
+                        Seal Object
+                    </button>
+                    
+                    <div id="teacher-status">
+                        <div class="status-badge status-not-sealed">
+                            ✓ Not Sealed
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-grid">
+            <div class="result-card">
+                <div class="result-title">Extensible Status</div>
+                <div class="result-value" id="extensible-result" style="color: var(--success-color);">true</div>
+                <div class="result-description">Object.isExtensible(student)</div>
+            </div>
+            
+            <div class="result-card">
+                <div class="result-title">Sealed Status</div>
+                <div class="result-value" id="sealed-result" style="color: var(--success-color);">false</div>
+                <div class="result-description">Object.isSealed(teacher)</div>
+            </div>
+        </div>
+
+        <div class="console-output">
+            <div class="console-header">
+                🖥️ Console Output
+            </div>
+            <div id="console-content">
+                <div class="console-line">
+                    <span class="console-command">// Creating student object...</span>
+                </div>
+                <div class="console-line">
+                    <span class="console-output-text">Student object created with initial properties</span>
+                </div>
+                <div class="console-line">
+                    <span class="console-command">// Creating teacher object...</span>
+                </div>
+                <div class="console-line">
+                    <span class="console-output-text">Teacher object created with subject: "Math"</span>
+                </div>
+                <div class="console-line">
+                    <span class="console-result">Ready for demonstration!</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Create student object
+        const student = {
+            name: "John Doe",
+            age: 20,
+            grade: "A"
+        };
+
+        // Create teacher object
+        const teacher = {
+            subject: "Math"
+        };
+
+        // Variables to store status
+        let extensibleStatus = Object.isExtensible(student);
+        let sealedStatus = Object.isSealed(teacher);
+
+        // Update initial display
+        updateDisplay();
+
+        function preventStudentExtensions() {
+            // Prevent extensions on student object
+            Object.preventExtensions(student);
+            
+            // Check if extensible
+            extensibleStatus = Object.isExtensible(student);
+            
+            // Update display
+            updateStudentStatus();
+            updateConsole("Student object extensions prevented");
+            
+            // Try to add a new property (this will fail silently)
+            try {
+                student.newProperty = "This won't work";
+                updateConsole("Attempted to add new property: " + (student.newProperty || "undefined"));
+            } catch (error) {
+                updateConsole("Error adding property: " + error.message);
+            }
+            
+            // Print to console
+            console.log("extensibleStatus:", extensibleStatus);
+            updateConsole("extensibleStatus: " + extensibleStatus);
+        }
+
+        function sealTeacherObject() {
+            // Seal the teacher object
+            Object.seal(teacher);
+            
+            // Check if sealed
+            sealedStatus = Object.isSealed(teacher);
+            
+            // Update display
+            updateTeacherStatus();
+            updateConsole("Teacher object sealed");
+            
+            // Try to add a new property (this will fail silently)
+            try {
+                teacher.newProperty = "This won't work";
+                updateConsole("Attempted to add new property: " + (teacher.newProperty || "undefined"));
+            } catch (error) {
+                updateConsole("Error adding property: " + error.message);
+            }
+            
+            // Try to modify existing property (this should work)
+            teacher.subject = "Physics";
+            updateConsole("Modified existing property - subject: " + teacher.subject);
+            
+            // Print to console
+            console.log("sealedStatus:", sealedStatus);
+            updateConsole("sealedStatus: " + sealedStatus);
+        }
+
+        function updateStudentStatus() {
+            const statusDiv = document.getElementById('student-status');
+            if (extensibleStatus) {
+                statusDiv.innerHTML = '<div class="status-badge status-extensible">✓ Extensible</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="status-badge status-not-extensible">🔒 Not Extensible</div>';
+            }
+            
+            document.getElementById('extensible-result').textContent = extensibleStatus;
+            document.getElementById('extensible-result').style.color = extensibleStatus ? 'var(--success-color)' : 'var(--error-color)';
+        }
+
+        function updateTeacherStatus() {
+            const statusDiv = document.getElementById('teacher-status');
+            if (sealedStatus) {
+                statusDiv.innerHTML = '<div class="status-badge status-sealed">🔒 Sealed</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="status-badge status-not-sealed">✓ Not Sealed</div>';
+            }
+            
+            document.getElementById('sealed-result').textContent = sealedStatus;
+            document.getElementById('sealed-result').style.color = sealedStatus ? 'var(--warning-color)' : 'var(--success-color)';
+            
+            // Update teacher object display
+            const teacherDisplay = document.getElementById('teacher-object-display');
+            teacherDisplay.innerHTML = `
+                {<br>
+                &nbsp;&nbsp;subject: "${teacher.subject}"<br>
+                }
+            `;
+        }
+
+        function updateDisplay() {
+            updateStudentStatus();
+            updateTeacherStatus();
+        }
+
+        function updateConsole(message) {
+            const consoleContent = document.getElementById('console-content');
+            const newLine = document.createElement('div');
+            newLine.className = 'console-line';
+            newLine.innerHTML = `<span class="console-output-text">${message}</span>`;
+            consoleContent.appendChild(newLine);
+            
+            // Auto-scroll to bottom
+            consoleContent.scrollTop = consoleContent.scrollHeight;
+        }
+
+        // Initial console output
+        console.log("Initial extensibleStatus:", extensibleStatus);
+        console.log("Initial sealedStatus:", sealedStatus);
+        
+        // Print status to console as required by assignment
+        function printStatus() {
+            console.log("extensibleStatus:", extensibleStatus);
+            console.log("sealedStatus:", sealedStatus);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart with Billing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .cart-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .cart-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .cart-item {
+            background: #e3f2fd;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #2196f3;
+            color: #1976d2;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-card.selected {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+
+        .product-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #27ae60;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-execute {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            font-size: 1em;
+            padding: 12px 20px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .bill-section {
+            background: #fff5f5;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .bill-details {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .bill-header {
+            text-align: center;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bill-header h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .bill-header p {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .bill-items {
+            margin-bottom: 15px;
+        }
+
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .bill-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-quantity {
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .item-price {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .bill-summary {
+            border-top: 2px solid #e9ecef;
+            padding-top: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #2c3e50;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 8px;
+        }
+
+        .customer-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .log-section {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .log-content {
+            background: #34495e;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            line-height: 1.4;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 3px;
+            padding: 1px 0;
+        }
+
+        .log-entry.success {
+            color: #2ecc71;
+        }
+
+        .log-entry.info {
+            color: #3498db;
+        }
+
+        .log-entry.warning {
+            color: #f39c12;
+        }
+
+        .empty-bill {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 30px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Shopping Cart & Billing</h1>
+            <p>Select items to add to cart and generate bill</p>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="section">
+                    <h2>Available Products</h2>
+                    <div class="products-grid">
+                        <div class="product-card" onclick="addToCart('Milk', 45)">
+                            <div class="product-icon">🥛</div>
+                            <div class="product-name">Milk</div>
+                            <div class="product-price">₹45</div>
+                        </div>
+                        <div class="product-card" onclick="addToCart('Coffee', 120)">
+                            <div class="product-icon">☕</div>
+                            <div class="product-name">Coffee</div>
+                            <div class="product-price">₹120</div>
+                        </div>
+                        <div class="product-card" onclick="addToCart('Tea', 80)">
+                            <div class="product-icon">🍵</div>
+                            <div class="product-name">Tea</div>
+                            <div class="product-price">₹80</div>
+                        </div>
+                        <div class="product-card" onclick="addToCart('Green Tea', 150)">
+                            <div class="product-icon">🍃</div>
+                            <div class="product-name">Green Tea</div>
+                            <div class="product-price">₹150</div>
+                        </div>
+                        <div class="product-card" onclick="addToCart('Honey', 200)">
+                            <div class="product-icon">🍯</div>
+                            <div class="product-name">Honey</div>
+                            <div class="product-price">₹200</div>
+                        </div>
+                        <div class="product-card" onclick="addToCart('Meat', 350)">
+                            <div class="product-icon">🥩</div>
+                            <div class="product-name">Meat</div>
+                            <div class="product-price">₹350</div>
+                        </div>
+                        <div class="product-card" onclick="addToCart('Sugar', 60)">
+                            <div class="product-icon">🍬</div>
+                            <div class="product-name">Sugar</div>
+                            <div class="product-price">₹60</div>
+                        </div>
+                        <div class="product-card" onclick="addToCart('Bread', 35)">
+                            <div class="product-icon">🍞</div>
+                            <div class="product-name">Bread</div>
+                            <div class="product-price">₹35</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Current Cart</h2>
+                    <div class="cart-display">
+                        <div class="cart-items" id="cartItems">
+                            <!-- Cart items will be populated here -->
+                        </div>
+                        <div class="cart-count" id="cartCount">
+                            Total items: 0
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Settings & Operations</h2>
+                    <div class="controls">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="allergyCheckbox">
+                            <label for="allergyCheckbox">I'm allergic to honey</label>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="addMeatToBeginning()">
+                            Add Meat (Start)
+                        </button>
+                        <button class="btn btn-success" onclick="addSugarToEnd()">
+                            Add Sugar (End)
+                        </button>
+                        <button class="btn btn-danger" onclick="removeHoney()">
+                            Remove Honey
+                        </button>
+                        <button class="btn btn-warning" onclick="modifyTeaToGreenTea()">
+                            Tea → Green Tea
+                        </button>
+                        <button class="btn btn-primary" onclick="clearCart()">
+                            Clear Cart
+                        </button>
+                    </div>
+                    <button class="btn btn-execute" onclick="executeAllOperations()">
+                        🚀 Execute All Operations
+                    </button>
+                </div>
+
+                <div class="log-section">
+                    <h3>📋 Operation Log</h3>
+                    <div class="log-content" id="logContent">
+                        <div class="log-entry info">Ready to perform operations...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="section bill-section">
+                    <h2>💳 Bill Details</h2>
+                    <div id="billContent">
+                        <div class="empty-bill">
+                            <p>🛍️ Your cart is empty</p>
+                            <p>Click on products to add them to your cart</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>👤 Customer Information</h2>
+                    <div class="customer-info">
+                        <div class="form-group">
+                            <label for="customerName">Name:</label>
+                            <input type="text" id="customerName" placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone:</label>
+                            <input type="tel" id="customerPhone" placeholder="Enter your phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerEmail">Email:</label>
+                            <input type="email" id="customerEmail" placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAddress">Address:</label>
+                            <input type="text" id="customerAddress" placeholder="Enter your address">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Shopping cart data
+        let shoppingCart = [];
+        let cartItems = {}; // Object to store item quantities and prices
+        
+        // Function to add item to cart
+        function addToCart(itemName, price) {
+            if (cartItems[itemName]) {
+                cartItems[itemName].quantity += 1;
+            } else {
+                cartItems[itemName] = {
+                    price: price,
+                    quantity: 1
+                };
+                shoppingCart.push(itemName);
+            }
+            
+            // Visual feedback
+            highlightProduct(itemName);
+            addLogEntry(`Added ${itemName} to cart (₹${price})`, 'success');
+            updateCartDisplay();
+            updateBillDisplay();
+        }
+        
+        // Function to highlight selected product
+        function highlightProduct(itemName) {
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                if (card.textContent.includes(itemName)) {
+                    card.classList.add('selected');
+                    setTimeout(() => {
+                        card.classList.remove('selected');
+                    }, 300);
+                }
+            });
+        }
+        
+        // Function to update cart display
+        function updateCartDisplay() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            const cartCountDiv = document.getElementById('cartCount');
+            
+            cartItemsDiv.innerHTML = '';
+            let totalItems = 0;
+            
+            Object.keys(cartItems).forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.textContent = `${item} (${cartItems[item].quantity})`;
+                cartItemsDiv.appendChild(itemDiv);
+                totalItems += cartItems[item].quantity;
+            });
+            
+            cartCountDiv.textContent = `Total items: ${totalItems}`;
+        }
+        
+        // Function to update bill display
+        function updateBillDisplay() {
+            const billContent = document.getElementById('billContent');
+            
+            if (Object.keys(cartItems).length === 0) {
+                billContent.innerHTML = `
+                    <div class="empty-bill">
+                        <p>🛍️ Your cart is empty</p>
+                        <p>Click on products to add them to your cart</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const now = new Date();
+            const billNumber = `BILL${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            let subtotal = 0;
+            let billItemsHTML = '';
+            
+            Object.keys(cartItems).forEach(item => {
+                const itemData = cartItems[item];
+                const itemTotal = itemData.price * itemData.quantity;
+                subtotal += itemTotal;
+                
+                billItemsHTML += `
+                    <div class="bill-item">
+                        <div class="item-details">
+                            <span class="item-quantity">${itemData.quantity}</span>
+                            <span class="item-name">${item}</span>
+                        </div>
+                        <span class="item-price">₹${itemTotal}</span>
+                    </div>
+                `;
+            });
+            
+            const tax = Math.round(subtotal * 0.18); // 18% GST
+            const total = subtotal + tax;
+            
+            billContent.innerHTML = `
+                <div class="bill-details">
+                    <div class="bill-header">
+                        <h3>🏪 QuickMart Store</h3>
+                        <p>Bill #: ${billNumber}</p>
+                        <p>Date: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}</p>
+                    </div>
+                    
+                    <div class="bill-items">
+                        ${billItemsHTML}
+                    </div>
+                    
+                    <div class="bill-summary">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span>₹${subtotal}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>GST (18%):</span>
+                            <span>₹${tax}</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span>₹${total}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Function to add log entry
+        function addLogEntry(message, type = 'info') {
+            const logContent = document.getElementById('logContent');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            logContent.appendChild(logEntry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        
+        // Assignment functions
+        function addMeatToBeginning() {
+            if (!Object.keys(cartItems).includes('Meat')) {
+                addToCart('Meat', 350);
+                addLogEntry("Added 'Meat' to the beginning", 'success');
+            } else {
+                addLogEntry("'Meat' is already in the cart", 'warning');
+            }
+        }
+        
+        function addSugarToEnd() {
+            if (!Object.keys(cartItems).includes('Sugar')) {
+                addToCart('Sugar', 60);
+                addLogEntry("Added 'Sugar' to the end", 'success');
+            } else {
+                addLogEntry("'Sugar' is already in the cart", 'warning');
+            }
+        }
+        
+        function removeHoney() {
+            if (cartItems['Honey']) {
+                delete cartItems['Honey'];
+                shoppingCart = shoppingCart.filter(item => item !== 'Honey');
+                addLogEntry("Removed 'Honey' from cart", 'success');
+                updateCartDisplay();
+                updateBillDisplay();
+            } else {
+                addLogEntry("'Honey' is not in the cart", 'warning');
+            }
+        }
+        
+        function modifyTeaToGreenTea() {
+            if (cartItems['Tea']) {
+                const teaData = cartItems['Tea'];
+                delete cartItems['Tea'];
+                cartItems['Green Tea'] = teaData;
+                
+                const teaIndex = shoppingCart.indexOf('Tea');
+                if (teaIndex !== -1) {
+                    shoppingCart[teaIndex] = 'Green Tea';
+                }
+                
+                addLogEntry("Modified 'Tea' to 'Green Tea'", 'success');
+                updateCartDisplay();
+                updateBillDisplay();
+            } else {
+                addLogEntry("'Tea' is not in the cart to modify", 'warning');
+            }
+        }
+        
+        function clearCart() {
+            cartItems = {};
+            shoppingCart = [];
+            addLogEntry("Cart cleared", 'info');
+            updateCartDisplay();
+            updateBillDisplay();
+        }
+        
+        function executeAllOperations() {
+            addLogEntry("=== Starting all operations ===", 'info');
+            
+            // Add default items if cart is empty
+            if (Object.keys(cartItems).length === 0) {
+                addToCart('Milk', 45);
+                addToCart('Coffee', 120);
+                addToCart('Tea', 80);
+                addToCart('Honey', 200);
+                addLogEntry("Added default items to cart", 'info');
+            }
+            
+            addMeatToBeginning();
+            addSugarToEnd();
+            
+            const isAllergic = document.getElementById('allergyCheckbox').checked;
+            if (isAllergic) {
+                removeHoney();
+            }
+            
+            modifyTeaToGreenTea();
+            
+            addLogEntry("=== All operations completed ===", 'info');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartDisplay();
+            updateBillDisplay();
+            addLogEntry("Shopping cart and billing system initialized", 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,628 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h4 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .students-list {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .students-list h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .student-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .student-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .grade-a {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .grade-b {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .grade-c {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .grade-d {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .no-students {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .student-info {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .student-actions {
+                justify-content: center;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Student Management System</h1>
+            <p>Manage your students with ease and efficiency</p>
+        </div>
+
+        <div class="content">
+            <div class="stats">
+                <div class="stat-card">
+                    <h4 id="totalStudents">0</h4>
+                    <p>Total Students</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="averageAge">0</h4>
+                    <p>Average Age</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="topGrade">N/A</h4>
+                    <p>Most Common Grade</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="form-section">
+                    <h3>Add New Student</h3>
+                    <div class="form-group">
+                        <label for="firstName">First Name:</label>
+                        <input type="text" id="firstName" placeholder="Enter first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name:</label>
+                        <input type="text" id="lastName" placeholder="Enter last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" placeholder="Enter age" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="grade">Grade:</label>
+                        <select id="grade">
+                            <option value="">Select Grade</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="addStudent()">Add Student</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>Update Student</h3>
+                    <div class="form-group">
+                        <label for="updateId">Student ID:</label>
+                        <input type="number" id="updateId" placeholder="Enter student ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateFirstName">First Name:</label>
+                        <input type="text" id="updateFirstName" placeholder="Enter first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateLastName">Last Name:</label>
+                        <input type="text" id="updateLastName" placeholder="Enter last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateAge">Age:</label>
+                        <input type="number" id="updateAge" placeholder="Enter age" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateGrade">Grade:</label>
+                        <select id="updateGrade">
+                            <option value="">Select Grade</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" onclick="updateStudent()">Update Student</button>
+                </div>
+            </div>
+
+            <div id="alert" class="alert" style="display: none;"></div>
+
+            <div class="students-list">
+                <h3>Student List</h3>
+                <div class="filter-section">
+                    <label for="gradeFilter">Filter by Grade:</label>
+                    <select id="gradeFilter" onchange="filterStudents()">
+                        <option value="">All Grades</option>
+                        <option value="A">Grade A</option>
+                        <option value="B">Grade B</option>
+                        <option value="C">Grade C</option>
+                        <option value="D">Grade D</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="showAllStudents()">Show All</button>
+                </div>
+                <div id="studentsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial array of students
+        let students = [
+            { id: 1, firstName: "John", lastName: "Doe", age: 20, grade: "A" },
+            { id: 2, firstName: "Jane", lastName: "Smith", age: 22, grade: "B" },
+            { id: 3, firstName: "Bob", lastName: "Johnson", age: 19, grade: "A" },
+            { id: 4, firstName: "Alice", lastName: "Brown", age: 21, grade: "C" },
+            { id: 5, firstName: "Charlie", lastName: "Davis", age: 23, grade: "B" }
+        ];
+
+        let nextId = 6;
+
+        // Function to show alerts
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Function to add a new student
+        function addStudent() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const age = parseInt(document.getElementById('age').value);
+            const grade = document.getElementById('grade').value;
+
+            // Validation
+            if (!firstName || !lastName || !age || !grade) {
+                showAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (age < 1 || age > 100) {
+                showAlert('Age must be between 1 and 100', 'error');
+                return;
+            }
+
+            // Create new student object
+            const newStudent = {
+                id: nextId++,
+                firstName: firstName,
+                lastName: lastName,
+                age: age,
+                grade: grade
+            };
+
+            // Add to students array
+            students.push(newStudent);
+
+            // Clear form
+            document.getElementById('firstName').value = '';
+            document.getElementById('lastName').value = '';
+            document.getElementById('age').value = '';
+            document.getElementById('grade').value = '';
+
+            // Update display
+            displayStudents();
+            updateStats();
+            showAlert(`Student ${firstName} ${lastName} added successfully!`);
+        }
+
+        // Function to update student information
+        function updateStudent() {
+            const id = parseInt(document.getElementById('updateId').value);
+            const firstName = document.getElementById('updateFirstName').value.trim();
+            const lastName = document.getElementById('updateLastName').value.trim();
+            const age = parseInt(document.getElementById('updateAge').value);
+            const grade = document.getElementById('updateGrade').value;
+
+            // Find student
+            const studentIndex = students.findIndex(student => student.id === id);
+            
+            if (studentIndex === -1) {
+                showAlert('Student not found', 'error');
+                return;
+            }
+
+            // Update only non-empty fields
+            if (firstName) students[studentIndex].firstName = firstName;
+            if (lastName) students[studentIndex].lastName = lastName;
+            if (age && age >= 1 && age <= 100) students[studentIndex].age = age;
+            if (grade) students[studentIndex].grade = grade;
+
+            // Clear form
+            document.getElementById('updateId').value = '';
+            document.getElementById('updateFirstName').value = '';
+            document.getElementById('updateLastName').value = '';
+            document.getElementById('updateAge').value = '';
+            document.getElementById('updateGrade').value = '';
+
+            // Update display
+            displayStudents();
+            updateStats();
+            showAlert('Student updated successfully!');
+        }
+
+        // Function to delete a student
+        function deleteStudent(id) {
+            const studentIndex = students.findIndex(student => student.id === id);
+            
+            if (studentIndex === -1) {
+                showAlert('Student not found', 'error');
+                return;
+            }
+
+            const student = students[studentIndex];
+            if (confirm(`Are you sure you want to delete ${student.firstName} ${student.lastName}?`)) {
+                students.splice(studentIndex, 1);
+                displayStudents();
+                updateStats();
+                showAlert(`Student ${student.firstName} ${student.lastName} deleted successfully!`);
+            }
+        }
+
+        // Function to display all students
+        function displayStudents(studentsToShow = students) {
+            const studentsList = document.getElementById('studentsList');
+            
+            if (studentsToShow.length === 0) {
+                studentsList.innerHTML = '<div class="no-students">No students found</div>';
+                return;
+            }
+
+            studentsList.innerHTML = studentsToShow.map(student => `
+                <div class="student-card">
+                    <div class="student-info">
+                        <div>
+                            <div class="student-name">${student.firstName} ${student.lastName}</div>
+                            <div class="student-details">ID: ${student.id}</div>
+                        </div>
+                        <div class="student-details">Age: ${student.age}</div>
+                        <div>
+                            <span class="grade-badge grade-${student.grade.toLowerCase()}">Grade ${student.grade}</span>
+                        </div>
+                    </div>
+                    <div class="student-actions">
+                        <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Function to find students by grade
+        function findStudentsByGrade(grade) {
+            return students.filter(student => student.grade === grade);
+        }
+
+        // Function to filter students
+        function filterStudents() {
+            const gradeFilter = document.getElementById('gradeFilter').value;
+            
+            if (gradeFilter === '') {
+                displayStudents();
+            } else {
+                const filteredStudents = findStudentsByGrade(gradeFilter);
+                displayStudents(filteredStudents);
+            }
+        }
+
+        // Function to show all students
+        function showAllStudents() {
+            document.getElementById('gradeFilter').value = '';
+            displayStudents();
+        }
+
+        // Function to calculate average age
+        function calculateAverageAge() {
+            if (students.length === 0) return 0;
+            
+            const totalAge = students.reduce((sum, student) => sum + student.age, 0);
+            return (totalAge / students.length).toFixed(1);
+        }
+
+        // Function to get most common grade
+        function getMostCommonGrade() {
+            if (students.length === 0) return 'N/A';
+            
+            const gradeCount = {};
+            students.forEach(student => {
+                gradeCount[student.grade] = (gradeCount[student.grade] || 0) + 1;
+            });
+            
+            let maxCount = 0;
+            let mostCommon = 'N/A';
+            
+            for (const grade in gradeCount) {
+                if (gradeCount[grade] > maxCount) {
+                    maxCount = gradeCount[grade];
+                    mostCommon = grade;
+                }
+            }
+            
+            return mostCommon;
+        }
+
+        // Function to update statistics
+        function updateStats() {
+            document.getElementById('totalStudents').textContent = students.length;
+            document.getElementById('averageAge').textContent = calculateAverageAge();
+            document.getElementById('topGrade').textContent = getMostCommonGrade();
+        }
+
+        // Initialize the application
+        function init() {
+            displayStudents();
+            updateStats();
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>

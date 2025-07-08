@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Analytics Dashboard | EduMetrics Pro</title>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2c5282;
+            --accent-color: #3182ce;
+            --success-color: #38a169;
+            --warning-color: #d69e2e;
+            --error-color: #e53e3e;
+            --neutral-100: #f7fafc;
+            --neutral-200: #edf2f7;
+            --neutral-300: #e2e8f0;
+            --neutral-400: #cbd5e0;
+            --neutral-500: #a0aec0;
+            --neutral-600: #718096;
+            --neutral-700: #4a5568;
+            --neutral-800: #2d3748;
+            --neutral-900: #1a202c;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--neutral-100) 0%, var(--neutral-200) 100%);
+            min-height: 100vh;
+            color: var(--neutral-800);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: -2rem auto 0;
+            padding: 0 2rem 4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--neutral-200);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-xl), 0 0 0 1px var(--accent-color);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+            padding: 2rem;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .card-header h2 {
+            color: var(--neutral-800);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header p {
+            color: var(--neutral-600);
+            font-size: 0.95rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--neutral-700);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--neutral-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .form-input:hover {
+            border-color: var(--neutral-400);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--neutral-600) 0%, var(--neutral-700) 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--neutral-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--accent-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neutral-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-description {
+            font-size: 0.85rem;
+            color: var(--neutral-600);
+            line-height: 1.4;
+        }
+
+        .comparison-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comparison-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .comparison-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .comparison-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comparison-item {
+            text-align: center;
+        }
+
+        .comparison-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .comparison-result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, var(--error-color) 0%, #c53030 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .data-table th {
+            background: var(--neutral-50);
+            font-weight: 600;
+            color: var(--neutral-700);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table td {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .main-container {
+                padding: 0 1rem 2rem;
+            }
+            
+            .card-header,
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0 1rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .comparison-value {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>EduMetrics Pro</h1>
+            <p>Advanced Student Analytics Dashboard</p>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="card">
+            <div class="card-header">
+                <h2>
+                    <span class="stat-icon">📊</span>
+                    Statistical Analysis Tool
+                </h2>
+                <p>Comprehensive statistical analysis of student age demographics with professional-grade calculations</p>
+            </div>
+            
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="ages-input" class="form-label">Student Ages Dataset</label>
+                    <input 
+                        type="text" 
+                        id="ages-input" 
+                        class="form-input"
+                        placeholder="Enter comma-separated age values (e.g., 19, 22, 19, 24, 20, 25, 26, 24, 25, 24)"
+                        value="19, 22, 19, 24, 20, 25, 26, 24, 25, 24"
+                    >
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="calculateStats()">
+                        Analyze Dataset
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetAnalysis()">
+                        Clear Analysis
+                    </button>
+                </div>
+
+                <div id="results" class="results-container" style="display: none;">
+                    <div class="stats-grid" id="stats-grid">
+                        <!-- Stats will be populated here -->
+                    </div>
+                    
+                    <div class="comparison-card">
+                        <h3 class="comparison-title">📈 Variance Analysis</h3>
+                        <div class="comparison-content" id="comparison-content">
+                            <!-- Comparison will be populated here -->
+                        </div>
+                        <div class="comparison-result" id="comparison-result">
+                            <!-- Result will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 2rem;">
+                        <div class="card-header">
+                            <h2>
+                                <span class="stat-icon">📋</span>
+                                Data Summary
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dataset</th>
+                                        <th>Values</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-table-body">
+                                    <!-- Table data will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function calculateStats() {
+            const input = document.getElementById('ages-input').value.trim();
+            
+            if (!input) {
+                showError('Please enter student ages to analyze.');
+                return;
+            }
+
+            try {
+                // Parse and validate input
+                const ages = input.split(',').map(age => {
+                    const num = parseInt(age.trim());
+                    if (isNaN(num) || num <= 0 || num > 120) {
+                        throw new Error('Invalid age value');
+                    }
+                    return num;
+                });
+
+                if (ages.length === 0) {
+                    throw new Error('No valid ages found');
+                }
+
+                // Perform calculations
+                const sortedAges = [...ages].sort((a, b) => a - b);
+                const minAge = Math.min(...ages);
+                const maxAge = Math.max(...ages);
+                const median = calculateMedian(sortedAges);
+                const average = ages.reduce((sum, age) => sum + age, 0) / ages.length;
+                const range = maxAge - minAge;
+                const minDistance = Math.abs(minAge - average);
+                const maxDistance = Math.abs(maxAge - average);
+
+                // Display results
+                displayResults({
+                    original: ages,
+                    sorted: sortedAges,
+                    min: minAge,
+                    max: maxAge,
+                    median: median,
+                    average: average,
+                    range: range,
+                    minDistance: minDistance,
+                    maxDistance: maxDistance,
+                    count: ages.length
+                });
+
+            } catch (error) {
+                showError('Invalid input format. Please ensure all values are valid ages between 1-120, separated by commas.');
+            }
+        }
+
+        function calculateMedian(sortedArray) {
+            const length = sortedArray.length;
+            const middle = Math.floor(length / 2);
+            
+            if (length % 2 === 0) {
+                return (sortedArray[middle - 1] + sortedArray[middle]) / 2;
+            } else {
+                return sortedArray[middle];
+            }
+        }
+
+        function displayResults(stats) {
+            const resultsDiv = document.getElementById('results');
+            const statsGrid = document.getElementById('stats-grid');
+            const comparisonContent = document.getElementById('comparison-content');
+            const comparisonResult = document.getElementById('comparison-result');
+            const dataTableBody = document.getElementById('data-table-body');
+            
+            // Populate stats grid
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Sample Size</div>
+                        <div class="stat-icon">N</div>
+                    </div>
+                    <div class="stat-value">${stats.count}</div>
+                    <div class="stat-description">Total number of students in dataset</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Minimum Age</div>
+                        <div class="stat-icon">↓</div>
+                    </div>
+                    <div class="stat-value">${stats.min}</div>
+                    <div class="stat-description">Youngest student in the dataset</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Maximum Age</div>
+                        <div class="stat-icon">↑</div>
+                    </div>
+                    <div class="stat-value">${stats.max}</div>
+                    <div class="stat-description">Oldest student in the dataset</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Median Age</div>
+                        <div class="stat-icon">⌀</div>
+                    </div>
+                    <div class="stat-value">${stats.median}</div>
+                    <div class="stat-description">Middle value when sorted</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Average Age</div>
+                        <div class="stat-icon">μ</div>
+                    </div>
+                    <div class="stat-value">${stats.average.toFixed(2)}</div>
+                    <div class="stat-description">Arithmetic mean of all ages</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Range</div>
+                        <div class="stat-icon">R</div>
+                    </div>
+                    <div class="stat-value">${stats.range}</div>
+                    <div class="stat-description">Difference between max and min</div>
+                </div>
+            `;
+
+            // Populate comparison
+            comparisonContent.innerHTML = `
+                <div class="comparison-item">
+                    <div class="comparison-label">|min - average|</div>
+                    <div class="comparison-value">${stats.minDistance.toFixed(2)}</div>
+                </div>
+                <div class="comparison-item">
+                    <div class="comparison-label">|max - average|</div>
+                    <div class="comparison-value">${stats.maxDistance.toFixed(2)}</div>
+                </div>
+            `;
+
+            const comparisonText = stats.minDistance < stats.maxDistance 
+                ? 'Minimum age is closer to the average than maximum age'
+                : stats.minDistance > stats.maxDistance 
+                ? 'Maximum age is closer to the average than minimum age'
+                : 'Both minimum and maximum ages are equally distant from the average';
+
+            comparisonResult.innerHTML = `
+                <strong>Analysis Result:</strong><br>
+                ${comparisonText}
+            `;
+
+            // Populate data table
+            dataTableBody.innerHTML = `
+                <tr>
+                    <td><strong>Original Dataset</strong></td>
+                    <td>[${stats.original.join(', ')}]</td>
+                </tr>
+                <tr>
+                    <td><strong>Sorted Dataset</strong></td>
+                    <td>[${stats.sorted.join(', ')}]</td>
+                </tr>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            const statsGrid = document.getElementById('stats-grid');
+            
+            statsGrid.innerHTML = `<div class="error-message">${message}</div>`;
+            resultsDiv.style.display = 'block';
+        }
+
+        function resetAnalysis() {
+            document.getElementById('ages-input').value = '';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        // Auto-calculate on page load
+        window.addEventListener('load', function() {
+            calculateStats();
+        });
+    </script>
+</body>
+</html>
